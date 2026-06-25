@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TMS Pro - Select Broker</title>
+    <!-- Use Inter font for a modern look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Background dynamic elements -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <main class="container">
+      <div class="glass-card">
+        <div class="header">
+          <div class="icon-wrapper">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 17L12 22L22 17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 12L12 17L22 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h1>TMS Pro</h1>
+          <p>Supercharge your trading workflow with automated execution and smart features.</p>
+        </div>
+
+        <form id="broker-form" class="broker-form">
+          <div class="input-group">
+            <label for="broker-id">Enter your Broker ID</label>
+            <div class="input-wrapper">
+              <span class="prefix">tms</span>
+              <input 
+                type="number" 
+                id="broker-id" 
+                placeholder="e.g. 58" 
+                min="1" 
+                max="99" 
+                required 
+                autofocus
+                autocomplete="off"
+              />
+              <span class="suffix">.nepsetms.com.np</span>
+            </div>
+          </div>
+          
+
+
+          <button type="submit" class="launch-btn">
+            <span>Launch TMS</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </form>
+      </div>
+      
+      <div class="footer">
+        Powered by Advanced Agentic Automation
+      </div>
+    </main>
+
+    <script>
+      // Handle switch parameter to clear saved broker
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('switch')) {
+        localStorage.removeItem('nepse_auto_trade_broker');
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
+      // Helper function to validate broker availability
+      function validateAndNavigate(brokerId, isAutoRedirect) {
+        const targetUrl = `https://tms${brokerId}.nepsetms.com.np/`;
+        
+        if (isAutoRedirect) {
+          document.body.innerHTML = '<div style="color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; font-family: Inter; font-size: 1.2rem;"><div>Connecting to Broker ' + brokerId + '...</div><div style="font-size: 0.9rem; color: #aaa; margin-top: 10px;">Verifying connection...</div></div>';
+        } else {
+          const btn = document.querySelector('.launch-btn');
+          btn.classList.add('loading');
+          btn.innerHTML = '<span class="spinner"></span> Connecting...';
+        }
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+
+        fetch(targetUrl, { mode: 'no-cors', cache: 'no-cache', signal: controller.signal })
+          .then(() => {
+            clearTimeout(timeoutId);
+            localStorage.setItem('nepse_auto_trade_broker', brokerId);
+            window.location.href = targetUrl;
+          })
+          .catch((err) => {
+            clearTimeout(timeoutId);
+            localStorage.removeItem('nepse_auto_trade_broker');
+            alert(`Broker ${brokerId} website is offline, invalid, or taking too long to respond.\n\nPlease check the number and try again.`);
+            window.location.reload();
+          });
+      }
+
+      const savedBroker = localStorage.getItem('nepse_auto_trade_broker');
+      
+      if (savedBroker) {
+        validateAndNavigate(savedBroker, true);
+      }
+
+      const input = document.getElementById('broker-id');
+
+      document.getElementById('broker-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const brokerId = input.value.trim();
+        
+        if (!brokerId || isNaN(brokerId)) return;
+        
+        validateAndNavigate(brokerId, false);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>NEPSE Automation</title>
+  <style>
+/* Dynamic Fonts & UI */
+
+:root {
+  --font-family: 'Tw Cen MT', 'Tw Cen MT Condensed', system-ui, sans-serif;
+  --bg-color: #0f172a;
+  --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+  --card-bg: rgba(30, 41, 59, 0.7);
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --accent-primary: #8b5cf6;
+  --accent-hover: #7c3aed;
+  --accent-gradient: linear-gradient(90deg, #8b5cf6, #6366f1);
+  --title-gradient: linear-gradient(90deg, #c084fc, #3b82f6);
+  --buy-color: #10b981;
+  --buy-bg: rgba(16, 185, 129, 0.15);
+  --sell-color: #ef4444;
+  --sell-bg: rgba(239, 68, 68, 0.15);
+  --border-color: #334155;
+  --border-radius: 12px;
+  --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  --transition: all 0.2s ease;
+}
+
+/* ── THEME: Aquatic ───────────────────────────────────────────────────── */
+[data-theme="aquatic"] {
+  --font-family: 'Segoe UI', 'Helvetica Neue', system-ui, sans-serif;
+  --bg-color: #0a192f;
+  --bg-gradient: linear-gradient(135deg, #0a192f 0%, #0d2b45 50%, #0f3460 100%);
+  --card-bg: rgba(13, 43, 69, 0.75);
+  --text-main: #e0f4ff;
+  --text-muted: #7fb3d3;
+  --accent-primary: #00b4d8;
+  --accent-hover: #0096c7;
+  --accent-gradient: linear-gradient(90deg, #00b4d8, #0077b6);
+  --title-gradient: linear-gradient(90deg, #48cae4, #00b4d8);
+  --buy-color: #06d6a0;
+  --buy-bg: rgba(6, 214, 160, 0.15);
+  --sell-color: #ff6b6b;
+  --sell-bg: rgba(255, 107, 107, 0.15);
+  --border-color: #1a4a6e;
+  --shadow: 0 4px 15px rgba(0, 119, 182, 0.2);
+}
+
+/* ── THEME: Desert ────────────────────────────────────────────────────── */
+[data-theme="desert"] {
+  --font-family: 'Georgia', 'Palatino Linotype', serif;
+  --bg-color: #1a120b;
+  --bg-gradient: linear-gradient(135deg, #1a120b 0%, #2d1b0e 50%, #3c2415 100%);
+  --card-bg: rgba(60, 36, 21, 0.75);
+  --text-main: #fef3e2;
+  --text-muted: #c4a882;
+  --accent-primary: #e8871e;
+  --accent-hover: #d97706;
+  --accent-gradient: linear-gradient(90deg, #e8871e, #ca6702);
+  --title-gradient: linear-gradient(90deg, #fbbf24, #e8871e);
+  --buy-color: #84cc16;
+  --buy-bg: rgba(132, 204, 22, 0.15);
+  --sell-color: #ef4444;
+  --sell-bg: rgba(239, 68, 68, 0.15);
+  --border-color: #5c3d2e;
+  --shadow: 0 4px 15px rgba(232, 135, 30, 0.15);
+}
+
+/* ── THEME: Dusk ──────────────────────────────────────────────────────── */
+[data-theme="dusk"] {
+  --font-family: 'Trebuchet MS', 'Lucida Sans Unicode', sans-serif;
+  --bg-color: #1a1025;
+  --bg-gradient: linear-gradient(135deg, #1a1025 0%, #2d1748 50%, #3a1255 100%);
+  --card-bg: rgba(45, 23, 72, 0.7);
+  --text-main: #fce7f3;
+  --text-muted: #c084b0;
+  --accent-primary: #ec4899;
+  --accent-hover: #db2777;
+  --accent-gradient: linear-gradient(90deg, #ec4899, #a855f7);
+  --title-gradient: linear-gradient(90deg, #f9a8d4, #c084fc);
+  --buy-color: #34d399;
+  --buy-bg: rgba(52, 211, 153, 0.15);
+  --sell-color: #fb7185;
+  --sell-bg: rgba(251, 113, 133, 0.15);
+  --border-color: #4a2060;
+  --shadow: 0 4px 15px rgba(236, 72, 153, 0.15);
+}
+
+/* ── THEME: Night Green ───────────────────────────────────────────────── */
+[data-theme="nightgreen"] {
+  --font-family: 'Consolas', 'Courier New', monospace;
+  --bg-color: #0a1a0a;
+  --bg-gradient: linear-gradient(135deg, #0a1a0a 0%, #0d2818 50%, #0f3520 100%);
+  --card-bg: rgba(13, 40, 24, 0.75);
+  --text-main: #dcfce7;
+  --text-muted: #6ee7a0;
+  --accent-primary: #22c55e;
+  --accent-hover: #16a34a;
+  --accent-gradient: linear-gradient(90deg, #22c55e, #15803d);
+  --title-gradient: linear-gradient(90deg, #4ade80, #22c55e);
+  --buy-color: #4ade80;
+  --buy-bg: rgba(74, 222, 128, 0.15);
+  --sell-color: #f87171;
+  --sell-bg: rgba(248, 113, 113, 0.15);
+  --border-color: #1a4a2e;
+  --shadow: 0 4px 15px rgba(34, 197, 94, 0.15);
+}
+
+html { 
+  font-size: 14px; 
+  background-color: var(--bg-color); /* Fallback for full-tab mode */
+  min-height: 100vh;
+}
+html[data-font-size="small"] { font-size: 12px; }
+html[data-font-size="large"] { font-size: 16px; }
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family, 'Tw Cen MT', system-ui, sans-serif);
+}
+
+body {
+  background: var(--bg-gradient);
+  color: var(--text-main);
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  min-height: 520px;
+  overflow-x: hidden;
+  transition: background 0.4s ease;
+}
+
+.container {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 14px;
+}
+
+h1 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  background: var(--title-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em;
+}
+
+h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 12px;
+}
+
+/* Toggle Switch */
+.mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--border-color);
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background: var(--accent-gradient);
+}
+
+input:checked + .slider:before {
+  transform: translateX(16px);
+}
+
+/* Forms */
+.order-form {
+  background: var(--card-bg);
+  padding: 16px;
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
+}
+
+.input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+input, select {
+  width: 100%;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  outline: none;
+  transition: var(--transition);
+}
+
+input:focus, select:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+
+input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ── Compact Form Controls ────────────────────────────────────────────── */
+.form-sub-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+  padding: 8px 10px;
+  background: rgba(15, 23, 42, 0.35);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.inline-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.inline-control label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  width: auto;
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+.compact-input {
+  width: 56px !important;
+  flex: 0 0 56px !important;
+  padding: 6px 8px !important;
+  font-size: 0.82rem !important;
+  text-align: center;
+}
+
+.compact-select {
+  width: auto !important;
+  flex: 0 0 auto !important;
+  padding: 6px 8px !important;
+  font-size: 0.82rem !important;
+  min-width: 64px;
+}
+
+.unit {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.helper-text {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+  padding: 0 2px;
+}
+
+.helper-text strong {
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+.btn-primary {
+  width: 100%;
+  background: var(--accent-gradient);
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.6);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+.btn-danger {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+.btn-danger:hover {
+  background: #b91c1c;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.error-msg {
+  color: var(--sell-color);
+  font-size: 0.8rem;
+  margin-top: 8px;
+  text-align: center;
+}
+
+/* Order List */
+#orders-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+#orders-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+#orders-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#orders-container::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.order-card {
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: 4px solid var(--border-color);
+  padding: 12px 14px;
+  border-radius: var(--border-radius);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: var(--transition);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.order-card:hover {
+  transform: translateX(2px);
+  background: rgba(30, 41, 59, 0.9);
+}
+
+.order-card.buy {
+  border-left-color: var(--buy-color);
+}
+
+.order-card.sell {
+  border-left-color: var(--sell-color);
+}
+
+.order-card.executed {
+  opacity: 0.6;
+  border-left-color: var(--text-muted);
+}
+
+.order-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.order-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge {
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.badge.buy {
+  background: var(--buy-bg);
+  color: var(--buy-color);
+}
+
+.badge.sell {
+  background: var(--sell-bg);
+  color: var(--sell-color);
+}
+
+.order-details {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.order-details span {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: var(--transition);
+}
+
+.delete-btn:hover {
+  color: var(--sell-color);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Animations */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.order-card {
+  animation: slideIn 0.3s ease forwards;
+}
+
+/* Disabled Form State */
+.execution-mode {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Card action buttons (edit + delete) */
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.edit-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  transition: var(--transition);
+  line-height: 1;
+}
+
+.edit-btn:hover {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.12);
+}
+
+/* Highlight the card currently being edited */
+.order-card.editing {
+  border-left-color: #f59e0b !important;
+  background: rgba(245, 158, 11, 0.06) !important;
+  box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.25);
+}
+
+/* Cancel Edit button */
+.btn-cancel {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  padding: 9px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: var(--transition);
+}
+
+.btn-cancel:hover {
+  border-color: #f59e0b;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.08);
+}
+
+/* ── Silent Mode Section ──────────────────────────────────────────────── */
+.silent-mode-section {
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--border-radius);
+  padding: 12px 14px;
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
+}
+
+.silent-toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.silent-label-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.silent-icon {
+  font-size: 1.4rem;
+}
+
+.silent-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  display: block;
+}
+
+.silent-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  display: block;
+  margin-top: 1px;
+}
+
+.silent-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.ghost-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.ghost-dot.active {
+  background: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+  animation: ghostPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes ghostPulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(16, 185, 129, 0.4); }
+  50% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.8); }
+}
+
+/* ── Theme Picker ─────────────────────────────────────────────────────── */
+.theme-picker {
+  width: auto;
+  min-width: 0;
+  max-width: 120px;
+  padding: 5px 8px;
+  font-size: 0.72rem;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  border-radius: 6px;
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.theme-picker:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+
+.theme-picker option {
+  background: var(--bg-color);
+  color: var(--text-main);
+}
+
+.settings-panel {
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--border-radius);
+  padding: 14px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
+}
+.settings-panel .theme-picker {
+  max-width: none;
+  flex: 1;
+}
+
+/* ── Tolerance Slider ─────────────────────────────────────────────────── */
+.tolerance-setting {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.tolerance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.tolerance-header label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.tolerance-value {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  background: rgba(139, 92, 246, 0.15);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.tolerance-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border-color);
+  outline: none;
+  margin: 8px 0 6px;
+  padding: 0;
+  border: none;
+}
+
+.tolerance-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(139, 92, 246, 0.5);
+  transition: box-shadow 0.2s ease;
+}
+
+.tolerance-slider::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.8);
+}
+
+/* Make header wrap nicely with the theme picker */
+header {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ── Broker Badge ───────────────────────────────────────────────────────── */
+.broker-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  vertical-align: middle;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-left: 10px;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important; /* Critical override for h1 gradient text */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: inline-block;
+}
+
+.broker-badge.active {
+  background: var(--accent-gradient);
+}
+
+.broker-badge.waiting {
+  background: rgba(75, 85, 99, 0.9);
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+</style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>NEPSE Auto Trade <span id="broker-id-badge" class="broker-badge waiting">Waiting for TMS...</span></h1>
+      <button id="settings-btn" title="Settings"
+        style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--text-main);">⚙️</button>
+      <div class="mode-toggle">
+        <label class="switch">
+          <input type="checkbox" id="mode-switch">
+          <span class="slider round"></span>
+        </label>
+        <span id="mode-label">Planning Mode</span>
+      </div>
+      <button id="kill-switch" class="btn-danger hidden">STOP ALL</button>
+    </header>
+
+    <main>
+      <!-- Settings Panel -->
+      <section id="settings-section" class="settings-panel hidden">
+        <h3>Settings</h3>
+        <div class="input-group">
+          <select id="theme-select" class="theme-picker">
+            <option value="default">🟣 Default (Tw Cen MT)</option>
+            <option value="aquatic">🔵 Aquatic (Segoe UI)</option>
+            <option value="desert">🟠 Desert (Georgia)</option>
+            <option value="dusk">🌸 Dusk (Trebuchet)</option>
+            <option value="nightgreen">🟢 Night Green (Consolas)</option>
+          </select>
+          <select id="font-size-select" class="theme-picker">
+            <option value="medium">Aa Medium Text</option>
+            <option value="small">aa Small Text</option>
+            <option value="large">AA Large Text</option>
+          </select>
+        </div>
+        <div class="tolerance-setting">
+          <div class="tolerance-header">
+            <label>Price Tolerance</label>
+            <span id="tolerance-display" class="tolerance-value">±3%</span>
+          </div>
+          <input type="range" id="tolerance-range" min="0.5" max="3" step="0.1" value="3" class="tolerance-slider">
+          <span class="helper-text">Bot only submits if price is within this range of LTP. Max ±3% (NEPSE limit).</span>
+        </div>
+        <div class="tolerance-setting">
+          <div class="tolerance-header">
+            <label>Advanced Triggers</label>
+            <label class="switch" style="margin:0;">
+              <input type="checkbox" id="advanced-triggers">
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <span class="helper-text">Show ≥ / ≤ condition options for directional orders.</span>
+        </div>
+      </section>
+
+      <!-- Silent Mode Toggle -->
+      <section class="silent-mode-section" id="silent-section">
+        <div class="silent-toggle-row">
+          <div class="silent-label-group">
+            <span class="silent-icon">👻</span>
+            <div>
+              <span class="silent-title">Silent Mode</span>
+              <span class="silent-desc">Auto-open background tab for execution</span>
+            </div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="silent-switch">
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <div class="silent-status hidden" id="silent-status">
+          <span class="ghost-dot" id="ghost-dot"></span>
+          <span id="ghost-label">Ghost Tab Inactive</span>
+        </div>
+      </section>
+
+      <section class="order-form" id="form-section">
+        <h3 id="form-title">Add New Order (<span id="order-count">0</span>/10)</h3>
+        <form id="add-order-form">
+          <!-- Row 1: Symbol, Qty, Buy/Sell -->
+          <div class="input-group">
+            <input type="text" id="symbol" placeholder="Symbol" list="symbol-list" required autocomplete="off"
+              style="text-transform:uppercase">
+            <datalist id="symbol-list"></datalist>
+            <input type="number" id="qty" placeholder="Qty" required min="10" style="width:80px;flex:0 0 80px;">
+            <select id="type" style="width:72px;flex:0 0 72px;">
+              <option value="BUY">BUY</option>
+              <option value="SELL">SELL</option>
+            </select>
+          </div>
+
+          <!-- Row 2: Trigger Price (+ optional condition in advanced mode) -->
+          <div class="input-group">
+            <input type="number" id="base-price" placeholder="Target Price" required step="0.1" style="flex:1;">
+            <select id="trigger-condition" class="advanced-only" style="flex:0 0 130px;display:none;">
+              <option value="auto" selected>Auto (Band)</option>
+              <option value=">=">if LTP ≥ Price</option>
+              <option value="<=">if LTP ≤ Price</option>
+            </select>
+          </div>
+          <span class="helper-text" style="display:block;margin-bottom:12px;">Places order when this price is within your tolerance range of LTP.</span>
+
+          <button type="submit" id="add-order-btn" class="btn-primary">Add Order</button>
+          <button type="button" id="cancel-edit-btn" class="btn-cancel hidden">✕ Cancel Edit</button>
+        </form>
+        <div id="form-error" class="error-msg hidden"></div>
+      </section>
+
+      <section class="order-list">
+        <h3>Planned Orders</h3>
+        <div id="orders-container">
+          <!-- Order cards injected here -->
+        </div>
+      </section>
+
+      <section class="audit-log hidden" id="audit-section" style="margin-top: 15px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h3 style="margin:0;">Live Audit Trail</h3>
+          <button id="toggle-audit-size" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1rem;padding:4px;transition:transform 0.2s ease;" title="Toggle Audit Trail">▲</button>
+        </div>
+        <div id="audit-container"
+          style="background:#000;color:#0f0;font-family:monospace;font-size:11px;padding:8px;height:120px;min-height:80px;resize:vertical;overflow-y:auto;border-radius:6px;border: 1px solid rgba(255,255,255,0.05);transition: height 0.3s ease;">
+        </div>
+      </section>
+    </main>
+  </div>
+  <script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const form = document.getElementById('add-order-form');
+  const symbolInput = document.getElementById('symbol');
+  const qtyInput = document.getElementById('qty');
+  const typeSelect = document.getElementById('type');
+  const basePriceInput = document.getElementById('base-price');
+  const triggerCondSelect = document.getElementById('trigger-condition');
+  const errorMsg = document.getElementById('form-error');
+  const container = document.getElementById('orders-container');
+  const countSpan = document.getElementById('order-count');
+
+  const killSwitch = document.getElementById('kill-switch');
+  const auditSection = document.getElementById('audit-section');
+  const auditContainer = document.getElementById('audit-container');
+
+  // Silent Mode elements
+  const silentSwitch = document.getElementById('silent-switch');
+  const silentStatus = document.getElementById('silent-status');
+  const ghostDot = document.getElementById('ghost-dot');
+  const ghostLabel = document.getElementById('ghost-label');
+
+  // Settings elements
+  const themeSelect = document.getElementById('theme-select');
+  const fontSizeSelect = document.getElementById('font-size-select');
+  const settingsBtn = document.getElementById('settings-btn');
+  const settingsSection = document.getElementById('settings-section');
+  const brokerBadge = document.getElementById('broker-id-badge');
+
+  const symbolList = document.getElementById('symbol-list');
+  const NEPSE_SYMBOLS_MAP = { "ADBL": "Agriculture Development Bank Limited", "CZBIL": "Citizen Bank International Limited", "EBL": "Everest Bank Limited", "GBIME": "Global IME Bank Limited", "HBL": "Himalayan Bank Limited", "KBL": "Kumari Bank Limited", "MBL": "Machhapuchchhre Bank Limited", "NABIL": "Nabil Bank Limited", "NBL": "Nepal Bank Limited", "NICA": "NIC Asia Bank Ltd.", "NMB": "NMB Bank Limited", "PCBL": "Prime Commercial Bank Ltd.", "SANIMA": "Sanima Bank Limited", "SBI": "Nepal SBI Bank Limited", "SBL": "Siddhartha Bank Limited", "SCB": "Standard Chartered Bank Limited", "PRVU": "Prabhu Bank Limited", "NIMB": "Nepal Investment Mega Bank Limited", "LSL": "Laxmi Sunrise Bank Limited", "CORBL": "Corporate Development Bank Limited", "EDBL": "Excel Development Bank Ltd.", "GBBL": "Garima Bikas Bank Limited", "JBBL": "Jyoti Bikas Bank Limited", "MDB": "Miteri Development Bank Limited", "MNBBL": "Muktinath Bikas Bank Ltd.", "NABBC": "Narayani Development Bank Limited", "SADBL": "Shangrila Development Bank Ltd.", "SHINE": "Shine Resunga Development Bank Ltd.", "SINDU": "Sindhu Bikash Bank Ltd", "GRDBL": "Green Development Bank Ltd.", "SABBL": "Salapa Bikas Bank Limited", "MLBL": "Mahalaxmi Bikas Bank Ltd.", "LBBL": "Lumbini Bikas Bank Ltd.", "KSBBL": "Kamana Sewa Bikas Bank Limited", "CFCL": "Central Finance Co. Ltd.", "GFCL": "Goodwill Finance Co. Ltd.", "GMFIL": "Guheshowori Merchant Bank & Finance Co. Ltd.", "ICFC": "ICFC Finance Limited", "JFL": "Janaki Finance Ltd.", "MFIL": "Manjushree Finance Ltd.", "MPFL": "Multipurpose Finance Company Limited", "NFS": "Nepal Finance Ltd.", "PFL": "Pokhara Finance Ltd.", "PROFL": "Progressive Finance Limited", "SIFC": "Shree Investment Finance Co. Ltd.", "RLFL": "Reliance Finance Ltd.", "GUFL": "Gurkhas Finance Ltd.", "BFC": "Best Finance Company Ltd.", "SFCL": "Samriddhi Finance Company Limited", "OHL": "Oriental Hotels Limited", "SHL": "Soaltee Hotel Limited", "TRH": "Taragaon Regency Hotel Limited", "CGH": "Chandragiri Hills Limited", "KDL": "Kalinchowk Darshan Limited", "CITY": "City Hotel Limited", "BANDIPUR": "Bandipur Cablecar and Tourism Limited", "HFIN": "Hotel Forest Inn Limited", "AHPC": "Arun Valley Hydropower Development Co. Ltd.", "BPCL": "Butwal Power Company Limited", "CHCL": "Chilime Hydropower Company Limited", "NHPC": "National Hydro Power Company Limited", "SHPC": "Sanima Mai Hydropower Ltd.", "HURJA": "Himalaya Urja Bikas Company Limited", "AKPL": "Arun Kabeli Power Ltd.", "BARUN": "Barun Hydropower Co. Ltd.", "API": "Api Power Company Ltd.", "NGPL": "Ngadi Group Power Ltd.", "MHL": "Mandakini Hydropower Limited", "NYADI": "Nyadi Hydropower Limited", "SJCL": "SANJEN JALAVIDHYUT COMPANY LIMITED", "RHPL": "RASUWAGADHI HYDROPOWER COMPANY LIMITED", "UMHL": "United Modi Hydropower Ltd.", "DORDI": "Dordi Khola Jal Bidyut Company Limited", "PHCL": "Peoples Hydropower Company Limited", "PPL": "People's Power Limited", "UPCL": "UNIVERSAL POWER COMPANY LTD", "SPL": "Shuvam Power Company Limited", "SPDL": "Synergy Power Development Ltd.", "MKJC": "Mailung Khola Jal Vidhyut Company  Limited", "SAHAS": "Sahas Urja Limited", "KKHC": "Khanikhola Hydropower Co. Ltd.", "HPPL": "Himalayan Power Partner Ltd.", "DHPL": "Dibyashwori Hydropower Ltd.", "BHPL": "Barahi Hydropower Public Limited", "MHNL": "Mountain Hydro Nepal Limited", "CHL": "Chhyangdi Hydropower Ltd.", "USHL": "Upper Syange  Hydropower Limited", "SPHL": "Sayapatri Hydropower Limited", "NHDL": "Nepal Hydro Developers Ltd.", "RADHI": "Radhi Bidyut Company Ltd", "BNHC": "Buddhabhumi Nepal Hydropower Company Limited", "RHGCL": "Rapti Hydro and General Construction Limited", "KPCL": "Kalika power Company Ltd", "TAMOR": "Sanima Middle Tamor Hydropower Limited", "GHL": "Ghalemdi Hydro Limited", "EHPL": "Eastern Hydropower Limited", "MKHC": "Maya Khola Hydropower Company Limited", "BEDC": "Bhugol Energy Development Company Limited", "PMHPL": "Panchakanya Mai Hydropower Ltd", "KBSH": "Kutheli Bukhari Small Hydropower Limited", "GLH": "Greenlife Hydropower Limited", "USHEC": "Upper Solu Hydro Electric Company Limited", "AKJCL": "Ankhu Khola Jalvidhyut Company Ltd", "LEC": "Liberty Energy Company Limited", "TPC": "Terhathum Power Company Limited", "SHEL": "Singati Hydro Energy Limited", "PPCL": "Panchthar Power Company Limited", "TSHL": "Three Star Hydropower Limited", "SSHL": "Shiva Shree Hydropower Limited", "JOSHI": "Joshi Hydropower Development Company Ltd", "TVCL": "Trishuli Jal Vidhyut Company Limited", "UNHPL": "Union Hydropower Limited", "SPC": "Samling Power Company Limited", "SGHC": "Swet-Ganga Hydropower & Construction Limited", "AHL": "Asian Hydropower Limited", "BHDC": "Bindyabasini Hydropower Development Company Limited", "HDHPC": "Himal Dolakha Hydropower Company Limited", "MHCL": "Molung Hydropower Company Limited", "SMH": "Super Mai Hydropower Limited", "RFPL": "River Falls Power Limited", "MEN": "Mountain Energy Nepal Limited", "UHEWA": "Upper Hewakhola Hydropower Company Limited", "HHL": "Himalayan Hydropower Limited", "UMRH": "United IDI Mardi RB Hydropower Limited.", "SIKLES": "Sikles Hydropower Limited", "MEL": "Modi Energy Limited", "MAKAR": "Makar Jitumaya Suri Hydropower Limited", "DHEL": "Daramkhola Hydro Energy Limited", "SMJC": "Sagarmatha Jalabidhyut Company Limited", "MKHL": "Mai Khola Hydropower Limited", "CKHL": "Chirkhwa Hydropower Limited", "MMKJL": "Mathillo Mailun Khola Jalvidhyut Limited", "DOLTI": "Dolti Power Company Limited", "BHL": "Balephi Hydropower Limited", "GVL": "Green Ventures Limited", "MSHL": "Mid-Solu Hydropower Limited", "BUNGAL": "Bungal Hydro Limited", "RIDI": "Ridi Power Company Limited", "HIMSTAR": "Him Star Urja Company Limited", "MEHL": "Manakamana Engineering Hydropower Limited", "IHL": "Ingwa Hydropower Limited", "SMHL": "Super Madi Hydropower Limited", "MCHL": "Menchhiyam Hydropower Limited", "BHCL": "Bikash Hydropower Company Limited", "SANVI": "Sanvi Energy Limited", "RAWA": "Rawa Energy Development Limited", "ULHC": "Upper Lohore Khola Hydropower Company Limited", "BGWT": "Bhagawati Hydropower Development Company Ltd.", "MANDU": "Mandu Hydropower Ltd.", "MABEL": "Mabilung Energy Limited", "VLUCL": "Vision Lumbini Urja Company Limited", "SKHL": "Super Khudi Hydropower Limited", "BJHL": "Bhujung Hydropower Limited", "SKHEL": "Suryakunda Hydro Electric Limited", "RLEL": "Ridge Line Energy Limited", "SOHL": "Solu Hydropower Limited", "CIT": "Citizen Investment Trust", "HATHY": "Hathway Investment Nepal Limited", "HIDCL": "Hydorelectricity Investment and Development Company Ltd", "NIFRA": "Nepal Infrastructure Bank Limited", "ENL": "Emerging Nepal Limited", "NRN": "NRN Infrastructure and Development Limited", "CHDC": "CEDB Holdings Limited", "ALICL": "Asian Life Insurance Co. Limited", "LICN": "Life Insurance Co. Nepal", "NLIC": "Nepal Life Insurance Co. Ltd.", "NLICL": "National Life Insurance Co. Ltd.", "CLI": "Citizen Life Insurance Company Limited", "RNLI": "Reliable Nepal Life Insurance Limited", "ILI": "IME Life Insurance Company Limited", "SNLI": "Sun Nepal Life Insurance Company Limited", "SJLIC": "SuryaJyoti Life Insurance Company Limited", "SRLI": "Sanima Reliance Life Insurance Limited", "HLI": "Himalayan Life Insurance Limited", "PMLI": "Prabhu Mahalaxmi Life Insurance Limited", "GMLI": "Guardian Micro-Life Insurance Limited", "CREST": "Crest Micro Life Insurance Ltd.", "BNL": "Bottlers Nepal (Balaju) Limited", "BNT": "Bottlers Nepal (Terai) Limited", "HDL": "Himalayan Distillery Limited", "NLO": "Nepal Lube Oil Limited", "UNL": "Unilever Nepal Limited", "SHIVM": "SHIVAM CEMENTS LTD", "SARBTM": "Sarbottam Cement Limited", "RSML": "Reliance Spinning Mills Limited", "SONA": "Sonapur Minerals and Oil Limited", "OMPL": "Om Megashree Pharmaceuticals Limited", "GCIL": "Ghorahi Cement Industry Limited", "SAGAR": "Sagar Distillery Limited", "SAIL": "Shreenagar Agritech Industries Limited", "SYPNL": "SY Panel Nepal Limited", "CBBL": "Chhimek Laghubitta Bittiya Sanstha Limited", "DDBL": "Deprosc Laghubitta Bittiya Sanstha Limited", "FMDBL": "First Micro Finance Laghubitta Bittiya Sanstha Limited", "KMCDB": "Kalika Laghubitta Bittiya Sanstha Limited", "NUBL": "Nirdhan Utthan Laghubitta Bittiya Sanstha Limited", "SKBBL": "Sana Kisan Bikas Laghubitta Bittiya sanstha Limited.", "SLBBL": "Swarojgar Laghubitta Bittiya Sanstha Ltd.", "SWBBL": "Swabalamban Laghubitta Bittiya Sanstha Limited", "MLBBL": "Mithila Laghubitta Bittiya Sanstha Ltd.", "LLBS": "Laxmi Laghubitta Bittiya Sanstha Ltd.", "JSLBB": "Janautthan Samudayic Laghubitta Bittiya Sanstha Limited", "VLBS": "Vijaya laghubitta Bittiya Sanstha Ltd.", "RSDC": "RSDC Laghubitta Bittiya Sanstha Ltd.", "NMBMF": "NMB Laghubitta Bittiya Sanstha Ltd.", "MERO": "Meromicrofinance Laghubitta Bittiya Sanstha Ltd.", "ALBSL": "Asha Laghubitta Bittiya Sanstha Limited", "NMFBS": "National Laghubitta Bittiya Sanstha Limited", "GMFBS": "Ganapati Microfinance Bittiya Sanstha Ltd", "HLBSL": "Himalayan Laghubitta Bittiya Sanstha Limited", "ILBS": "Infinity Laghubitta Bittiya Sanstha Limited", "FOWAD": "Forward Microfinance Laghubitta Bittiya Sanstha Ltd.", "SMATA": "Samata Gharelu Laghubitta Bittiya Sanstha Limited", "MSLB": "Mahuli Laghubitta Bittiya Sanstha Ltd.", "GILB": "Global IME Laghubitta Bittiya Sanstha Ltd.", "SMB": "Support Laghubitta Bittiya Sanstha Limited", "GBLBS": "Grameen Bikas Laghubitta Bittiya Sanstha Ltd.", "NESDO": "NESDO Sambridha Laghubitta Bittiye Sanstha Limited", "MLBSL": "Mahila Laghubitta Bittiya Sanstha Limited", "GLBSL": "Gurans Laghubitta Bittiya Sanstha Limited", "NICLBSL": "NIC Asia Laghubitta Biitiya Sanstha Limited", "SLBSL": "Samudayik Laghubitta Bittiya Sanstha Limited", "UNLB": "Unique Nepal Laghubitta Bittiya Sanstha Limited", "SWASTIK": "Swastik Laghubitta Bittiya Sanstha Limited", "JBLB": "Jeevan Bikas Laghubitta Bittiya Sanstha Limited", "SHLB": "Shrijanshil Laghubitta Bittiya Sanstha Limited", "ULBSL": "Upakar Laghubitta Bittiya Sanstha Limited", "SMFBS": "Swabhimaan Laghubitta Bittiya Sanstha Ltd", "WNLB": "WEAN Nepal Laghubitta Bittiya Sanstha Limited", "SAMAJ": "Samaj Laghubittya Bittiya Sanstha Limited", "DLBS": "Dhaulagiri Laghubitta Bittiya Sanstha Limited", "ANLB": "Aatmanirbhar Laghubitta Bittiya Sanstha Limited", "MLBS": "Manushi Laghubitta Bittiya Sanstha Limited", "AVYAN": "Aviyan Laghubitta Bittiya Sanstha Limited", "ACLBSL": "Aarambha Chautari Laghubitta Bittiya Sanstha Limited", "USLB": "Unnati Sahakarya Laghubitta Bittiya Sanstha Limited", "CYCL": "CYC Nepal Laghubitta Bittiya Sanstha Limited", "SWMF": "Suryodaya Womi Laghubitta Bittiya Sanstha Limited", "NMLBBL": "Nerude Mirmire Laghubitta Bittiya Sanstha Limited", "MATRI": "Matribhumi Laghubitta Bittiya Sanstha Limited", "SMPDA": "Sampada Laghubitta Bittiya Sanstha Limited", "NICL": "Nepal Insurance Co. Ltd.", "NIL": "Neco Insurance Co. Ltd.", "NLG": "NLG Insurance Company Ltd.", "SICL": "Shikhar Insurance Co. Ltd.", "PRIN": "Prabhu Insurance Ltd.", "RBCL": "Rastriya Beema Company Limited", "IGI": "IGI Prudential Insurance Company Limited", "HEI": "Himalayan Everest Insurance Limited", "SGIC": "Sanima GIC Insurance Limited", "SPIL": "Siddhartha Premier Insurance Limited", "SALICO": "Sagarmatha Lumbini Insurance Co. Limited", "UAIL": "United Ajod Insurance Limited", "NMIC": "Nepal Micro Insurance Co. Ltd.", "NTC": "Nepal Doorsanchar Comapany Limited", "NRIC": "Nepal Re-Insurance Company Limited", "HRL": "Himalayan Reinsurance Limited", "MKCL": "Muktinath Krishi Company Limited", "TTL": "Trade Tower Limited", "JHAPA": "Jhapa Energy Limited", "NRM": "Nepal Republic Media Limited", "PURE": "Pure Energy Ltd.", "NWCL": "Nepal Warehousing Company Limited", "BBC": "Bishal Bazar Company Limited", "STC": "Salt Trading Corporation" };
+
+  Object.entries(NEPSE_SYMBOLS_MAP).forEach(([sym, name]) => {
+    const opt = document.createElement('option');
+    opt.value = name ? `${sym} (${name})` : sym;
+    symbolList.appendChild(opt);
+  });
+
+  // Tolerance Slider
+  const toleranceRange = document.getElementById('tolerance-range');
+  const toleranceDisplay = document.getElementById('tolerance-display');
+
+  toleranceRange.addEventListener('input', async () => {
+    const val = parseFloat(toleranceRange.value);
+    toleranceDisplay.textContent = '±' + val + '%';
+    await chrome.storage.local.set({ priceTolerance: val });
+  });
+
+  // Advanced Triggers toggle
+  const advancedTriggersToggle = document.getElementById('advanced-triggers');
+  const triggerCondSelectEl = document.getElementById('trigger-condition');
+
+  advancedTriggersToggle.addEventListener('change', async () => {
+    const isAdvanced = advancedTriggersToggle.checked;
+    triggerCondSelectEl.style.display = isAdvanced ? 'block' : 'none';
+    if (!isAdvanced) triggerCondSelectEl.value = 'auto';
+    await chrome.storage.local.set({ advancedTriggers: isAdvanced });
+  });
+
+  const modeSwitch = document.getElementById('mode-switch');
+  const modeLabel = document.getElementById('mode-label');
+  const formSection = document.getElementById('form-section');
+
+  const addOrderBtn = document.getElementById('add-order-btn');
+  const formTitle = document.getElementById('form-title');
+  const cancelEditBtn = document.getElementById('cancel-edit-btn');
+
+  let orders = [];
+  let editingOrderId = null; // null = adding new; string = editing existing id
+
+  // Load existing data
+  const data = await chrome.storage.local.get(['orders', 'appMode', 'auditLogs', 'silentMode', 'ghostTabActive', 'selectedTheme', 'fontSize', 'brokerId', 'priceTolerance', 'advancedTriggers']);
+  if (data.orders) {
+    orders = data.orders;
+  }
+  renderLogs(data.auditLogs || []);
+
+  // Load Theme
+  if (data.selectedTheme) {
+    applyTheme(data.selectedTheme);
+    themeSelect.value = data.selectedTheme;
+  }
+
+  // Load Font Size
+  if (data.fontSize) {
+    applyFontSize(data.fontSize);
+    fontSizeSelect.value = data.fontSize;
+  }
+
+  // Load Price Tolerance
+  if (data.priceTolerance) {
+    toleranceRange.value = data.priceTolerance;
+    toleranceDisplay.textContent = '±' + data.priceTolerance + '%';
+  }
+
+  // Load Advanced Triggers
+  if (data.advancedTriggers) {
+    advancedTriggersToggle.checked = true;
+    triggerCondSelectEl.style.display = 'block';
+  }
+
+  // Load Silent Mode state
+  if (data.silentMode) {
+    silentSwitch.checked = true;
+  }
+  updateGhostStatus(data.ghostTabActive || false);
+  updateBrokerBadge(data.brokerId);
+
+  if (data.appMode === 'execution') {
+    modeSwitch.checked = true;
+    setExecutionMode(true);
+  } else {
+    setExecutionMode(false);
+  }
+
+  renderOrders();
+
+  // Storage Listener for Live Sync Dashboard
+  chrome.storage.onChanged.addListener((changes) => {
+    if (changes.orders) {
+      orders = changes.orders.newValue || [];
+      renderOrders();
+    }
+    if (changes.auditLogs) {
+      renderLogs(changes.auditLogs.newValue || []);
+    }
+    if (changes.appMode) {
+      const isExec = changes.appMode.newValue === 'execution';
+      modeSwitch.checked = isExec;
+      setExecutionMode(isExec);
+    }
+    if (changes.silentMode) {
+      silentSwitch.checked = changes.silentMode.newValue;
+    }
+    if (changes.ghostTabActive) {
+      updateGhostStatus(changes.ghostTabActive.newValue);
+    }
+    if (changes.brokerId) {
+      updateBrokerBadge(changes.brokerId.newValue);
+    }
+  });
+
+  // Mode Toggle manually by user
+  modeSwitch.addEventListener('change', async (e) => {
+    const isExec = e.target.checked;
+    await chrome.storage.local.set({ appMode: isExec ? 'execution' : 'planning' });
+    setExecutionMode(isExec);
+  });
+
+  // Global Kill Switch
+  killSwitch.addEventListener('click', async () => {
+    await chrome.storage.local.set({ appMode: 'planning' });
+    chrome.runtime.sendMessage({ action: "log_audit", log: `! GLOBAL STOP ACTIVATED BY USER !` });
+  });
+
+  // Silent Mode Toggle
+  silentSwitch.addEventListener('change', async (e) => {
+    await chrome.storage.local.set({ silentMode: e.target.checked });
+  });
+
+  // Theme Selector
+  themeSelect.addEventListener('change', async (e) => {
+    const theme = e.target.value;
+    applyTheme(theme);
+    await chrome.storage.local.set({ selectedTheme: theme });
+  });
+
+  // Font Size Selector
+  fontSizeSelect.addEventListener('change', async (e) => {
+    const size = e.target.value;
+    applyFontSize(size);
+    await chrome.storage.local.set({ fontSize: size });
+  });
+
+  // Settings Toggle
+  settingsBtn.addEventListener('click', () => {
+    settingsSection.classList.toggle('hidden');
+  });
+
+  // Audit Expand/Collapse
+  const toggleAuditSizeBtn = document.getElementById('toggle-audit-size');
+  let isAuditVisible = true;
+  toggleAuditSizeBtn.addEventListener('click', () => {
+    isAuditVisible = !isAuditVisible;
+    if (isAuditVisible) {
+      auditContainer.style.display = 'block';
+      toggleAuditSizeBtn.style.transform = 'rotate(0deg)';
+    } else {
+      auditContainer.style.display = 'none';
+      toggleAuditSizeBtn.style.transform = 'rotate(180deg)';
+    }
+  });
+
+  function applyTheme(theme) {
+    if (theme === 'default') {
+      document.documentElement.removeAttribute('data-theme');
+    } else {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+  }
+
+  function applyFontSize(size) {
+    document.documentElement.setAttribute('data-font-size', size);
+  }
+
+  function updateBrokerBadge(id) {
+    if (id) {
+      brokerBadge.textContent = `Broker ${id}`;
+      brokerBadge.style.display = 'inline-block';
+      brokerBadge.classList.add('active');
+      brokerBadge.classList.remove('waiting');
+    } else {
+      brokerBadge.textContent = `Waiting for TMS...`;
+      brokerBadge.style.display = 'inline-block';
+      brokerBadge.classList.add('waiting');
+      brokerBadge.classList.remove('active');
+    }
+  }
+
+  function updateGhostStatus(isActive) {
+    if (silentSwitch.checked) {
+      silentStatus.classList.remove('hidden');
+      if (isActive) {
+        ghostDot.className = 'ghost-dot active';
+        ghostLabel.textContent = 'Ghost Tab Active';
+        ghostLabel.style.color = '#10b981';
+      } else {
+        ghostDot.className = 'ghost-dot';
+        ghostLabel.textContent = 'Ghost Tab Inactive';
+        ghostLabel.style.color = 'var(--text-muted)';
+      }
+    } else {
+      silentStatus.classList.add('hidden');
+    }
+  }
+
+  function renderLogs(logs) {
+    auditContainer.innerHTML = logs.join('<br/><br/>');
+  }
+
+  function setExecutionMode(isExec) {
+    if (isExec) {
+      modeLabel.textContent = 'Execution Mode Active';
+      modeLabel.style.color = '#10b981';
+      document.body.style.borderTop = '4px solid #10b981';
+      killSwitch.classList.remove('hidden');
+      auditSection.classList.remove('hidden');
+    } else {
+      modeLabel.textContent = 'Planning Mode';
+      modeLabel.style.color = 'var(--text-muted)';
+      document.body.style.borderTop = '4px solid var(--accent-primary)';
+      killSwitch.classList.add('hidden');
+    }
+  }
+
+  // ── EDIT MODE HELPERS ──────────────────────────────────────────────────────
+  function enterEditMode(order) {
+    editingOrderId = order.id;
+
+    // Populate all form fields from the order
+    symbolInput.value = order.symbol;
+    qtyInput.value = order.qty;
+    typeSelect.value = order.type;
+    basePriceInput.value = order.basePrice;
+    triggerCondSelect.value = order.triggerCondition;
+
+    // Update form UI to edit state
+    formTitle.textContent = `Editing Order — ${order.symbol}`;
+    addOrderBtn.textContent = 'Update Order';
+    addOrderBtn.style.background = 'linear-gradient(90deg, #f59e0b, #d97706)';
+    cancelEditBtn.classList.remove('hidden');
+    symbolInput.focus();
+
+    // Scroll form into view
+    document.getElementById('form-section').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function cancelEditMode() {
+    editingOrderId = null;
+    form.reset();
+    formTitle.textContent = 'Add New Order';
+    addOrderBtn.textContent = 'Add Order';
+    addOrderBtn.style.background = '';
+    cancelEditBtn.classList.add('hidden');
+    errorMsg.classList.add('hidden');
+  }
+
+  cancelEditBtn.addEventListener('click', cancelEditMode);
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // Handle Order Add / Update
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorMsg.classList.add('hidden');
+
+    const basePrice = parseFloat(basePriceInput.value);
+    const triggerCondition = triggerCondSelect.value;
+    const computedTarget = basePrice;
+
+    let parsedSymbol = symbolInput.value.toUpperCase().trim();
+    if (parsedSymbol.includes(' (')) {
+      parsedSymbol = parsedSymbol.split(' (')[0];
+    }
+
+    if (editingOrderId) {
+      // ── UPDATE existing order in-place ──
+      const idx = orders.findIndex(o => o.id === editingOrderId);
+      if (idx > -1) {
+        orders[idx] = {
+          ...orders[idx],           // keep id, status, retries
+          symbol: parsedSymbol,
+          qty: parseInt(qtyInput.value),
+          type: typeSelect.value,
+          basePrice: basePrice,
+          triggerCondition: triggerCondition,
+          targetPrice: parseFloat(computedTarget.toFixed(2))
+        };
+        await chrome.storage.local.set({ orders });
+        cancelEditMode();
+        renderOrders();
+      }
+    } else {
+      // ── ADD new order ──
+      if (orders.length >= 10) {
+        errorMsg.textContent = 'Maximum 10 orders allowed in planning.';
+        errorMsg.classList.remove('hidden');
+        return;
+      }
+
+      const newOrder = {
+        id: Date.now().toString(),
+        symbol: parsedSymbol,
+        qty: parseInt(qtyInput.value),
+        type: typeSelect.value,
+        basePrice: basePrice,
+        triggerCondition: triggerCondition,
+        targetPrice: parseFloat(computedTarget.toFixed(2)),
+        status: 'pending',
+        retries: 0
+      };
+
+      orders.push(newOrder);
+      await chrome.storage.local.set({ orders });
+
+      // Reset form
+      symbolInput.value = '';
+      qtyInput.value = '';
+      basePriceInput.value = '';
+
+      renderOrders();
+    }
+  });
+
+  // Render Orders
+  function renderOrders() {
+    container.innerHTML = '';
+    countSpan.textContent = orders.length;
+
+    orders.forEach(order => {
+      const card = document.createElement('div');
+      const isEditing = order.id === editingOrderId;
+      card.className = `order-card ${order.type.toLowerCase()} ${order.status !== 'pending' ? 'executed' : ''} ${isEditing ? 'editing' : ''}`;
+
+      let statusIcon = '⏳';
+      if (order.status === 'executed') statusIcon = '✅';
+      if (order.status === 'failed') statusIcon = '❌';
+
+      card.innerHTML = `
+        <div class="order-info">
+          <div class="order-title">
+            ${order.symbol} <span class="badge ${order.type.toLowerCase()}">${order.type}</span> <span class="badge" style="background:var(--border-color);color:#fff">Target: रू ${order.targetPrice}</span>
+          </div>
+          <div class="order-details">
+            Qty: <span>${order.qty}</span> | Trigger: <span>${order.triggerCondition === 'auto' ? 'Band Auto' : 'LTP ' + order.triggerCondition + ' ' + order.basePrice}</span> | <span>${statusIcon}</span>
+          </div>
+        </div>
+        ${order.status === 'pending' ? `
+          <div class="card-actions">
+            <button class="edit-btn" data-id="${order.id}" title="Edit order">✏️</button>
+            <button class="delete-btn" data-id="${order.id}" title="Delete order">✖</button>
+          </div>
+        ` : ''}
+      `;
+
+      container.appendChild(card);
+    });
+
+    // Edit listeners
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = e.currentTarget.getAttribute('data-id');
+        const order = orders.find(o => o.id === id);
+        if (order) enterEditMode(order);
+      });
+    });
+
+    // Delete listeners
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const id = e.currentTarget.getAttribute('data-id');
+        if (editingOrderId === id) cancelEditMode();
+        orders = orders.filter(o => o.id !== id);
+        await chrome.storage.local.set({ orders });
+        renderOrders();
+      });
+    });
+  }
+});
+
+</script>
+</body>
+
+</html>
