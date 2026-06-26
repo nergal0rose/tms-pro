@@ -1153,7 +1153,34 @@ function injectHoldingsWidget() {
     widget.id = 'my-holdings-widget';
     widget.className = 'holdings-widget';
     
-    let html = '<h4>⚡ My Available Holdings (TMS Balance)</h4><div class="holdings-list">';
+    let html = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h4 style="margin: 0;">⚡ My Available Holdings (TMS Balance)</h4>
+            <button id="nepse-refresh-btn" class="tms-custom-tab" title="Refresh Page" style="
+                padding: 6px 12px;
+                background: #207a40;
+                color: #ffffff;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: bold;
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 8px rgba(32, 122, 64, 0.35);
+            ">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right: 4px;">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <polyline points="1 20 1 14 7 14"></polyline>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"></path>
+                    <path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"></path>
+                </svg>
+                Refresh
+            </button>
+        </div>
+        <div class="holdings-list">
+    `;
     for(let sym in holdings) {
         html += `<div class="holding-chip" data-sym="${sym}" data-qty="${holdings[sym]}">${sym}: ${holdings[sym]}</div>`;
     }
@@ -1161,6 +1188,16 @@ function injectHoldingsWidget() {
     widget.innerHTML = html;
     
     orderFormArea.insertBefore(widget, orderFormArea.firstChild);
+    
+    const refreshBtn = widget.querySelector('#nepse-refresh-btn');
+    if (refreshBtn) {
+        refreshBtn.onclick = (e) => {
+            e.preventDefault();
+            refreshBtn.classList.add('spinning');
+            setTimeout(() => refreshBtn.classList.remove('spinning'), 600);
+            window.location.reload();
+        };
+    }
     
     widget.querySelectorAll('.holding-chip').forEach(chip => {
         chip.addEventListener('click', async (e) => {
@@ -1632,38 +1669,92 @@ function initUI() {
     injectHoldingsWidget();
     injectTabs();
     
+    // ── SWITCH BROKER (small icon + hover label) ──
     if (!document.getElementById('nepse-switch-broker') && document.body && window.location.pathname.toLowerCase().includes('/login')) {
         const switchBtn = document.createElement('button');
         switchBtn.id = 'nepse-switch-broker';
-        switchBtn.innerHTML = 'Switch Broker';
+        switchBtn.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                <polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+            </svg>
+            <span class="nepse-switch-label">Switch Broker</span>
+        `;
         switchBtn.style.cssText = `
             position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #FCD535, #F8B400);
-            color: #1E2329;
-            border: none;
+            top: 12px;
+            right: 12px;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(252, 213, 53, 0.15);
+            color: #FCD535;
+            border: 1px solid rgba(252, 213, 53, 0.3);
             border-radius: 8px;
-            font-weight: 600;
-            font-size: 14px;
             cursor: pointer;
             z-index: 9999999;
-            box-shadow: 0 4px 15px rgba(252, 213, 53, 0.4);
-            transition: all 0.2s;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             font-family: 'Inter', sans-serif;
+            overflow: visible;
         `;
-        switchBtn.onmouseover = () => switchBtn.style.transform = 'scale(1.05)';
-        switchBtn.onmouseout = () => switchBtn.style.transform = 'scale(1)';
-        
+
+        // Inject tooltip styles once
+        if (!document.getElementById('nepse-switch-styles')) {
+            const styleEl = document.createElement('style');
+            styleEl.id = 'nepse-switch-styles';
+            styleEl.textContent = `
+                #nepse-switch-broker { position: fixed !important; }
+                #nepse-switch-broker .nepse-switch-label {
+                    position: absolute;
+                    right: 110%;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    white-space: nowrap;
+                    background: rgba(30, 35, 41, 0.95);
+                    color: #FCD535;
+                    font-size: 11px;
+                    font-weight: 600;
+                    padding: 4px 10px;
+                    border-radius: 6px;
+                    pointer-events: none;
+                    opacity: 0;
+                    transition: opacity 0.2s;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                }
+                #nepse-switch-broker:hover .nepse-switch-label { opacity: 1; }
+                #nepse-switch-broker:hover {
+                    background: rgba(252, 213, 53, 0.3) !important;
+                    transform: scale(1.1);
+                    box-shadow: 0 2px 12px rgba(252, 213, 53, 0.35);
+                }
+
+                #nepse-refresh-btn:hover {
+                    background: #1a6334 !important;
+                    transform: scale(1.05);
+                    box-shadow: 0 4px 15px rgba(32, 122, 64, 0.5);
+                }
+                @keyframes nepse-spin-once {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+                #nepse-refresh-btn.spinning svg {
+                    animation: nepse-spin-once 0.5s ease-in-out;
+                }
+            `;
+            (document.head || document.documentElement).appendChild(styleEl);
+        }
+
         switchBtn.onclick = () => {
             const localUrl = window.navigator.userAgent.includes('Windows') ? 'http://tauri.localhost/?switch=1' : 'tauri://localhost/?switch=1';
             window.location.href = localUrl;
         };
-        
+
         document.body.appendChild(switchBtn);
     }
-    
+
     if (!document.getElementById('nepse-ext-toggle') && document.body) {
         const toggle = document.createElement('button');
         toggle.id = 'nepse-ext-toggle';
