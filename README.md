@@ -34,6 +34,19 @@ Download the latest `.exe` or `.msi` from the Releases page and run the installe
 - **Backend:** Rust (Tauri v2)
 - **Injection Scripts:** Custom JS payloads (`tms_inject.js`, `mainScriptCaptcha.js`) loaded directly into the webview.
 
+## Screenshots
+
+<details>
+<summary>Click to view screenshots</summary>
+
+<img src="Screenshot/Screenshot%202026-06-26%20140355.png" alt="Screenshot 1" width="600"/>
+<img src="Screenshot/Screenshot%202026-06-26%20140705.png" alt="Screenshot 2" width="600"/>
+<img src="Screenshot/Screenshot%202026-06-26%20140946.png" alt="Screenshot 3" width="600"/>
+<img src="Screenshot/Screenshot%202026-06-26%20141207.png" alt="Screenshot 4" width="600"/>
+<img src="Screenshot/Screenshot%202026-06-26%20141306.png" alt="Screenshot 5" width="600"/>
+
+</details>
+
 ## Disclaimer and License
 
 **Disclaimer:** This project is built strictly for **educational purposes**. The creator and owner of this repository assume no responsibility or liability for any errors, financial losses, issues, or consequences arising from the use of this software. By using this software, you agree that you are using it entirely at your own risk.
