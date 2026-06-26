@@ -34,6 +34,10 @@ Download the latest `.exe` or `.msi` from the Releases page and run the installe
 - **Backend:** Rust (Tauri v2)
 - **Injection Scripts:** Custom JS payloads (`tms_inject.js`, `mainScriptCaptcha.js`) loaded directly into the webview.
 
-## License
+## Disclaimer and License
 
-MIT License. Note: This is an unofficial client and is not affiliated with the Nepal Stock Exchange (NEPSE).
+**Disclaimer:** This project is built strictly for **educational purposes**. The creator and owner of this repository assume no responsibility or liability for any errors, financial losses, issues, or consequences arising from the use of this software. By using this software, you agree that you are using it entirely at your own risk.
+
+**Free Use Policy:** This software is provided free of charge for personal and educational use. 
+
+**License:** MIT License. Note: This is an unofficial client and is not affiliated with the Nepal Stock Exchange (NEPSE).
